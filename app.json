@@ -1,0 +1,15 @@
+{
+  "name": "AI Scam Detector",
+  "description": "AI-powered scam detection using Google Gemini",
+  "repository": "https://github.com/yourusername/scam-detector",
+  "logo": "https://cdn-icons-png.flaticon.com/512/2910/2910791.png",
+  "keywords": ["node", "express", "gemini", "ai", "scam-detection"],
+  "image": "heroku/nodejs",
+  "env": {
+    "GEMINI_API_KEY": {
+      "description": "Google Gemini API Key from https://aistudio.google.com/app/apikey",
+      "required": true
+    }
+  }
+}
+
