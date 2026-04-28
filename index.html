@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Scam Detector</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI Scam Detector</h1>
+            <p>Paste any message to analyze if it's a scam</p>
+        </div>
+
+        <div class="demo-messages">
+            <span class="demo-label">Try a demo:</span>
+            <div class="demo-buttons">
+                <button class="demo-btn scam-demo" onclick="loadDemo('scam1')">🏆 Lottery Scam</button>
+                <button class="demo-btn scam-demo" onclick="loadDemo('scam2')">🏦 Bank Phishing</button>
+                <button class="demo-btn scam-demo" onclick="loadDemo('scam3')">📦 Delivery Scam</button>
+                <button class="demo-btn safe-demo" onclick="loadDemo('safe1')">✅ Normal Chat</button>
+                <button class="demo-btn safe-demo" onclick="loadDemo('safe2')">✅ Work Email</button>
+                <button class="demo-btn medium-demo" onclick="loadDemo('medium1')">⚠️ Free iPhone</button>
+            </div>
+
+        <div class="input-section">
+            <textarea id="message" placeholder="Paste suspicious message here... (e.g., Congratulations! You won $1,000,000. Click here to claim!)"></textarea>
+            <button id="analyzeBtn" onclick="analyze()">
+                <span class="btn-text">Analyze Message</span>
+                <span class="btn-loader hidden"></span>
+            </button>
+        </div>
+
+        <div id="result" class="result hidden">
+            <div class="result-header">
+                <h2>Analysis Result</h2>
+                <span id="riskBadge" class="badge">-</span>
+            </div>
+            <div class="result-content">
+                <div class="verdict-section">
+                    <span class="label">Verdict:</span>
+                    <span id="verdict" class="verdict">-</span>
+                </div>
+                <div class="reason-section">
+                    <span class="label">Reason:</span>
+                    <p id="reason">-</p>
+                </div>
+        </div>
+
+        <div class="footer">
+            <p>Powered by Google Gemini AI</p>
+        </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

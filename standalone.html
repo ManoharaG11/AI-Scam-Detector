@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Scam Detector</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #a0a0a0;
+            font-size: 1.1rem;
+        }
+
+        .api-key-section {
+            margin-bottom: 20px;
+        }
+
+        .api-key-section input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
+        .api-key-section input:focus {
+            outline: none;
+            border-color: #e94560;
+        }
+
+        .api-key-section label {
+            display: block;
+            margin-bottom: 5px;
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 1rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #e94560;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        textarea::placeholder {
+            color: #666;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #e94560, #c73e54);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(233, 69, 96, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .result {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .result-header h2 {
+            font-size: 1.3rem;
+            color: #fff;
+        }
+
+        .badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .badge.scam { background: rgba(233, 69, 96, 0.2); color: #ff6b6b; border: 1px solid rgba(233, 69, 96, 0.3); }
+        .badge.safe { background: rgba(46, 213, 115, 0.2); color: #2ed573; border: 1px solid rgba(46, 213, 115, 0.3); }
+        .badge.medium { background: rgba(255, 165, 2, 0.2); color: #ffa502; border: 1px solid rgba(255, 165, 2, 0.3); }
+        .badge.low { background: rgba(46, 213, 115, 0.2); color: #2ed573; border: 1px solid rgba(46, 213, 115, 0.3); }
+        .badge.high { background: rgba(233, 69, 96, 0.2); color: #ff6b6b; border: 1px solid rgba(233, 69, 96, 0.3); }
+
+        .result-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .verdict-section, .reason-section {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .label {
+            font-size: 0.9rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .verdict {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .verdict.scam { color: #ff6b6b; }
+        .verdict.safe { color: #2ed573; }
+
+        #reason {
+            color: #ccc;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid #e94560;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .info-box a {
+            color: #e94560;
+            text-decoration: none;
+        }
+
+        .info-box a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .result-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI Scam Detector</h1>
+            <p>Paste any message to analyze if it's a scam</p>
+        </div>
+
+        <div class="info-box">
+            <strong>Get API Key:</strong> Visit <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a> to get your free Gemini API key.
+        </div>
+
+        <div class="api-key-section">
+            <label for="apiKey">Gemini API Key</label>
+            <input type="password" id="apiKey" placeholder="Enter your Gemini API key here..." value="AIzaSyDbKIwvXRpaLdr-k2jD4qgEstiQ1e040Fs">
+        </div>
+
+        <div class="input-section">
+            <textarea id="message" placeholder="Paste suspicious message here... (e.g., Congratulations! You won $1,000,000. Click here to claim!)"></textarea>
+            <button id="analyzeBtn" onclick="analyze()">
+                <span class="btn-text">Analyze Message</span>
+                <span class="btn-loader hidden"></span>
+            </button>
+        </div>
+
+        <div id="result" class="result hidden">
+            <div class="result-header">
+                <h2>Analysis Result</h2>
+                <span id="riskBadge" class="badge">-</span>
+            </div>
+            <div class="result-content">
+                <div class="verdict-section">
+                    <span class="label">Verdict:</span>
+                    <span id="verdict" class="verdict">-</span>
+                </div>
+                <div class="reason-section">
+                    <span class="label">Reason:</span>
+                    <p id="reason">-</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Powered by Google Gemini AI</p>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+
+        const apiKeyInput = document.getElementById('apiKey');
+        const messageInput = document.getElementById('message');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const btnText = analyzeBtn.querySelector('.btn-text');
+        const btnLoader = analyzeBtn.querySelector('.btn-loader');
+        const resultDiv = document.getElementById('result');
+        const riskBadge = document.getElementById('riskBadge');
+        const verdictSpan = document.getElementById('verdict');
+        const reasonP = document.getElementById('reason');
+
+        async function analyze() {
+            const apiKey = apiKeyInput.value.trim();
+            const message = messageInput.value.trim();
+            
+            if (!apiKey) {
+                showError('Please enter your Gemini API key');
+                return;
+            }
+
+            if (!message) {
+                showError('Please enter a message to analyze');
+                return;
+            }
+
+            setLoading(true);
+            hideResult();
+
+            try {
+                const prompt = `
+                Analyze the following message and detect if it is a scam.
+
+                Return ONLY in JSON:
+                {
+                  "verdict": "Scam or Safe",
+                  "reason": "short explanation",
+                  "risk": "Low/Medium/High"
+                }
+
+                Message: ${message}
+                `;
+
+                const response = await fetch(`${API_URL}?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }]
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || 'API request failed');
+                }
+
+                const data = await response.json();
+                const text = data.candidates[0].content.parts[0].text;
+                
+                // Try to parse the JSON response
+                let parsedResult;
+                try {
+                    const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+                    if (jsonMatch) {
+                        parsedResult = JSON.parse(jsonMatch[1].trim());
+                    } else {
+                        parsedResult = JSON.parse(text);
+                    }
+                } catch (parseErr) {
+                    parsedResult = { 
+                        verdict: "Unknown", 
+                        reason: text, 
+                        risk: "Medium" 
+                    };
+                }
+
+                displayResult(parsedResult);
+            } catch (error) {
+                showError('Error: ' + error.message);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function displayResult(result) {
+            const verdict = result.verdict || 'Unknown';
+            const reason = result.reason || 'No explanation provided';
+            const risk = (result.risk || 'Medium').toLowerCase();
+
+            verdictSpan.textContent = verdict;
+            verdictSpan.className = 'verdict ' + (verdict.toLowerCase().includes('scam') ? 'scam' : 'safe');
+
+            reasonP.textContent = reason;
+
+            riskBadge.textContent = risk + ' Risk';
+            riskBadge.className = 'badge ' + risk;
+
+            resultDiv.classList.remove('hidden');
+        }
+
+        function showError(message) {
+            verdictSpan.textContent = 'Error';
+            verdictSpan.className = 'verdict scam';
+            reasonP.textContent = message;
+            riskBadge.textContent = 'Error';
+            riskBadge.className = 'badge high';
+            resultDiv.classList.remove('hidden');
+        }
+
+        function hideResult() {
+            resultDiv.classList.add('hidden');
+        }
+
+        function setLoading(isLoading) {
+            analyzeBtn.disabled = isLoading;
+            btnText.textContent = isLoading ? 'Analyzing...' : 'Analyze Message';
+            btnLoader.classList.toggle('hidden', !isLoading);
+        }
+
+        // Allow Ctrl+Enter to analyze
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                analyze();
+            }
+        });
+    </script>
+</body>
+</html>
