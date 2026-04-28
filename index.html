@@ -6,52 +6,76 @@
     <title>AI Scam Detector</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>AI Scam Detector</h1>
-            <p>Paste any message to analyze if it's a scam</p>
+<div class="container">
+
+    <div class="header">
+        <h1>AI Scam Detector</h1>
+        <p>Paste any message to analyze if it's a scam</p>
+    </div>
+
+    <div class="demo-messages">
+        <span>Try a demo:</span>
+        <div>
+            <button onclick="loadDemo('scam1')">🏆 Lottery Scam</button>
+            <button onclick="loadDemo('scam2')">🏦 Bank Phishing</button>
+            <button onclick="loadDemo('scam3')">📦 Delivery Scam</button>
+            <button onclick="loadDemo('safe1')">✅ Normal Chat</button>
+            <button onclick="loadDemo('safe2')">✅ Work Email</button>
         </div>
+    </div>
 
-        <div class="demo-messages">
-            <span class="demo-label">Try a demo:</span>
-            <div class="demo-buttons">
-                <button class="demo-btn scam-demo" onclick="loadDemo('scam1')">🏆 Lottery Scam</button>
-                <button class="demo-btn scam-demo" onclick="loadDemo('scam2')">🏦 Bank Phishing</button>
-                <button class="demo-btn scam-demo" onclick="loadDemo('scam3')">📦 Delivery Scam</button>
-                <button class="demo-btn safe-demo" onclick="loadDemo('safe1')">✅ Normal Chat</button>
-                <button class="demo-btn safe-demo" onclick="loadDemo('safe2')">✅ Work Email</button>
-                <button class="demo-btn medium-demo" onclick="loadDemo('medium1')">⚠️ Free iPhone</button>
-            </div>
+    <div class="input-section">
+        <textarea id="message" placeholder="Paste message here..."></textarea>
 
-        <div class="input-section">
-            <textarea id="message" placeholder="Paste suspicious message here... (e.g., Congratulations! You won $1,000,000. Click here to claim!)"></textarea>
-            <button id="analyzeBtn" onclick="analyze()">
-                <span class="btn-text">Analyze Message</span>
-                <span class="btn-loader hidden"></span>
-            </button>
-        </div>
+        <button onclick="analyze()">Analyze Message</button>
+    </div>
 
-        <div id="result" class="result hidden">
-            <div class="result-header">
-                <h2>Analysis Result</h2>
-                <span id="riskBadge" class="badge">-</span>
-            </div>
-            <div class="result-content">
-                <div class="verdict-section">
-                    <span class="label">Verdict:</span>
-                    <span id="verdict" class="verdict">-</span>
-                </div>
-                <div class="reason-section">
-                    <span class="label">Reason:</span>
-                    <p id="reason">-</p>
-                </div>
-        </div>
+    <div id="result" class="result" style="display:none;">
+        <h2>Result</h2>
+        <p><b>Verdict:</b> <span id="verdict"></span></p>
+        <p><b>Risk:</b> <span id="risk"></span></p>
+        <p><b>Reason:</b> <span id="reason"></span></p>
+    </div>
 
-        <div class="footer">
-            <p>Powered by Google Gemini AI</p>
-        </div>
+</div>
 
-    <script src="app.js"></script>
+<script>
+const API_URL = "/analyze";
+
+const demos = {
+    scam1: "Congratulations! You won $1,000,000 lottery. Click here now!",
+    scam2: "Your bank account is suspended. Share OTP immediately.",
+    scam3: "Delivery failed. Pay ₹50 to reschedule.",
+    safe1: "Hey, are we meeting today?",
+    safe2: "Please send the report by tomorrow."
+};
+
+function loadDemo(type) {
+    document.getElementById("message").value = demos[type];
+}
+
+async function analyze() {
+    const message = document.getElementById("message").value;
+
+    const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+    });
+
+    const data = await res.json();
+
+    const result = data.result;
+
+    document.getElementById("verdict").innerText = result.verdict;
+    document.getElementById("risk").innerText = result.risk;
+    document.getElementById("reason").innerText = result.reason;
+
+    document.getElementById("result").style.display = "block";
+}
+</script>
+
 </body>
 </html>
