@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 async function testGeminiAPI() {
-    const API_KEY = 'AIzaSyDbKIwvXRpaLdr-k2jD4qgEstiQ1e040Fs';
+    const API_KEY = '*******************************';
     const prompt = `Analyze: "You won $1,000,000! Click here now!"
     Return ONLY JSON: {"verdict":"Scam or Safe","reason":"short explanation","risk":"Low/Medium/High"}`;
 
