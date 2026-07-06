@@ -242,3 +242,7 @@ MIT License - feel free to use for personal or commercial projects.
 
 Built with AI to detect AI-powered scams! Stay safe online.
 
+Project Developer
+
+Manohara G
+
